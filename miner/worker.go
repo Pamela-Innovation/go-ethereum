@@ -51,8 +51,8 @@ var (
 // Users can specify the maximum number of blobs per block if necessary.
 func (miner *Miner) maxBlobsPerBlock(time uint64) int {
 	maxBlobs := eip4844.MaxBlobsPerBlock(miner.chainConfig, time)
-	if miner.config.MaxBlobsPerBlock != 0 {
-		maxBlobs = miner.config.MaxBlobsPerBlock
+	if configured := miner.config.MaxBlobsPerBlock; configured != 0 && configured < maxBlobs {
+		maxBlobs = configured
 	}
 	return maxBlobs
 }
@@ -345,6 +345,8 @@ func (miner *Miner) makeEnv(parent *types.Header, header *types.Header, coinbase
 		}
 	}
 	state.StartPrefetcher("miner", bundle)
+	evm := vm.NewEVM(core.NewEVMBlockContext(header, miner.chain, &coinbase), state, miner.chainConfig, vm.Config{})
+	evm.SetJumpDestCache(miner.chain.JumpDestCache())
 
 	// Note the passed coinbase may be different with header.Coinbase.
 	return &environment{
@@ -356,7 +358,7 @@ func (miner *Miner) makeEnv(parent *types.Header, header *types.Header, coinbase
 		header:   header,
 		bal:      bal.NewConstructionBlockAccessList(),
 		witness:  state.Witness(),
-		evm:      vm.NewEVM(core.NewEVMBlockContext(header, miner.chain, &coinbase), state, miner.chainConfig, vm.Config{}),
+		evm:      evm,
 	}, nil
 }
 
