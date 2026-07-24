@@ -615,6 +615,7 @@ func (f *BlobFetcher) loop() {
 					if len(f.waitlist[hash]) == 0 {
 						delete(f.waitlist, hash)
 						delete(f.waittime, hash)
+						delete(f.partial, hash)
 					}
 				}
 				delete(f.waitslots, drop.peer)
@@ -666,7 +667,7 @@ func (f *BlobFetcher) loop() {
 		blobFetcherWaitingPeers.Update(int64(len(f.waitslots)))
 		blobFetcherWaitingHashes.Update(int64(len(f.waitlist)))
 		blobFetcherQueueingPeers.Update(int64(len(f.announces) - len(f.requests)))
-		blobFetcherQueueingHashes.Update(int64(len(f.announces)))
+		blobFetcherQueueingHashes.Update(int64(len(f.full) + len(f.partial) - len(f.fetches) - len(f.waitlist)))
 		blobFetcherFetchingPeers.Update(int64(len(f.requests)))
 		blobFetcherFetchingHashes.Update(int64(len(f.fetches)))
 
