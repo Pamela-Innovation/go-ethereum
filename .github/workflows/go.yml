@@ -15,7 +15,7 @@ concurrency:
 jobs:
   lint:
     name: Lint
-    runs-on: [self-hosted-ghr, size-s-x64]
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:
@@ -30,7 +30,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v5
       with:
-        go-version: 1.25
+        go-version: '1.24'
         cache: false
 
     - name: Run linters
@@ -42,7 +42,7 @@ jobs:
   keeper:
     name: Keeper Builds
     needs: test
-    runs-on: [self-hosted-ghr, size-l-x64]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
@@ -51,7 +51,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.25'
+          go-version: '1.24'
           cache: false
 
       - name: Build
@@ -60,7 +60,7 @@ jobs:
   test-32bit:
     name: "32bit tests"
     needs: test
-    runs-on: [self-hosted-ghr, size-l-x64]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
@@ -69,7 +69,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.25'
+          go-version: '1.24'
           cache: false
 
       - name: Install cross toolchain
@@ -83,12 +83,12 @@ jobs:
   test:
     name: Test
     needs: lint
-    runs-on: [self-hosted-ghr, size-l-x64]
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         go:
-          - '1.25'
           - '1.24'
+          - '1.23'
     steps:
       - uses: actions/checkout@v4
         with:
